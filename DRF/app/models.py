@@ -6,3 +6,6 @@ class project_user(models.Model):
     age=models.IntegerField()
     email=models.EmailField()
     place=models.TextField()
+
+class student(models.Model):
+    

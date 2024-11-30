@@ -61,7 +61,88 @@ def fun3(req):
             s.save()
             return JsonResponse(s.data,status=status.HTTP_201_CREATED)
         else:
-            return JsonResponse(s.errors)
+            return JsonResponse(s.errors,status=status.HTTP_404_NOT_FOUND)
+        
+@api_view
+def fun4(req,d):
+    try:
+        demo=student.objects.get(pk=d)
+    except student.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    if req.method=='GET':
+        s=model_serializer(demo)
+        return Response(s.data)
+    elif req.method=='PUT':
+        s=model_serializer(demo,data=req.data)
+        if s.is_valid():
+            s.save()
+            return Response(s.data)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+    elif req.method=='DELETE':
+        demo.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class fun5(APIView):
+    def get(self,req):
+        demo=student.objects.all()
+        s=model_serializer(demo,many=True)
+        return Response(s.data)
+    
+    def post(self,req):
+        s=model_serializer(data=req.data)
+        if s.is_valid():
+            s.save()
+            return JsonResponse(s.data,status=status.HTTP_201_CREATED)
+        else:
+            return JsonResponse(s.data,status=status.HTTP_400_BAD_REQUEST)
+        
+class fun6(APIView):
+    def get(self,req,d):
+        try:
+            demo=student.objects.get(pk=d)
+            s=model_serializer(demo)
+            return Response(s.data)
+        except student.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
+    def put(self,req,d):
+        try:
+            demo=student.objects.get(pk=d)
+            s=model_serializer(demo,data=req.data)
+            if s.is_valid():
+                s.save()
+                return Response(s.data)
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+        except student.DoesNotExist:
+            return Response (status=status.HTTP_404_NOT_FOUND)
+    def delete(self,req,d):
+        try:
+            demo=student.objects.get(pk=d)
+            demo.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except student.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+class genericapiview(generics.GenericAPIView,mixins.ListModelMixin,Mixins.CreateModelMixin):
+    serializers_class=model_serializer
+    queryset=student.objects.all()
+    def get(self,req):
+        return self.list(req)
+    def post(self,req):
+        return self.create(req)
+
+class updtae(generics.GenericAPIView.mixins.RetrieveModelMixin,Mixins.UpdateModelMixin,mixins.DestroyModelMixin):
+    serializers_class=model_serializer
+    queryset=student.objects.all()
+    lookup_field='id'
+    def get(self,req,id=None):
+        return self.retrieve(req)
+    def put(self,req,id=None):
+        return self.update(req,id)
+    def delete(self,req,id):
+        return self.destroy(req,id)
+
+    
 
         
