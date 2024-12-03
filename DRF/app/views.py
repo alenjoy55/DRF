@@ -69,8 +69,8 @@ def fun3(req):
 @api_view
 def fun4(req,d):
     try:
-        demo=student.objects.get(pk=d)
-    except student.DoesNotExist:
+        demo=project_user.objects.get(pk=d)
+    except project_user.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     if req.method=='GET':
         s=model_serializer(demo)
@@ -88,7 +88,7 @@ def fun4(req,d):
     
 class fun5(APIView):
     def get(self,req):
-        demo=student.objects.all()
+        demo=project_user.objects.all()
         s=model_serializer(demo,many=True)
         return Response(s.data)
     
@@ -103,33 +103,33 @@ class fun5(APIView):
 class fun6(APIView):
     def get(self,req,d):
         try:
-            demo=student.objects.get(pk=d)
+            demo=project_user.objects.get(pk=d)
             s=model_serializer(demo)
             return Response(s.data)
-        except student.DoesNotExist:
+        except project_user.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
     def put(self,req,d):
         try:
-            demo=student.objects.get(pk=d)
+            demo=project_user.objects.get(pk=d)
             s=model_serializer(demo,data=req.data)
             if s.is_valid():
                 s.save()
                 return Response(s.data)
             else:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
-        except student.DoesNotExist:
+        except project_user.DoesNotExist:
             return Response (status=status.HTTP_404_NOT_FOUND)
     def delete(self,req,d):
         try:
-            demo=student.objects.get(pk=d)
+            demo=project_user.objects.get(pk=d)
             demo.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        except student.DoesNotExist:
+        except project_user.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 class genericapiview(generics.GenericAPIView,mixins.ListModelMixin,mixins.CreateModelMixin):
     serializers_class=model_serializer
-    queryset=student.objects.all()
+    queryset=project_user.objects.all()
     def get(self,req):
         return self.list(req)
     def post(self,req):
@@ -137,7 +137,7 @@ class genericapiview(generics.GenericAPIView,mixins.ListModelMixin,mixins.Create
 
 class updtae(generics.GenericAPIView.mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.DestroyModelMixin):
     serializers_class=model_serializer
-    queryset=student.objects.all()
+    queryset=project_user.objects.all()
     lookup_field='id'
     def get(self,req,id=None):
         return self.retrieve(req)
